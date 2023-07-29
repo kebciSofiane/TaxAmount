@@ -13,7 +13,6 @@ public class Main {
         int weight;
         int shipperId;
         int recipientId;
-        int clientId;
 
 
 
@@ -68,7 +67,7 @@ public class Main {
         while (true) ;
 
 
-        
+
 
 
         do {
@@ -87,9 +86,10 @@ public class Main {
 
         do {
             try {
-                System.out.println("Veuillez sélectionner qui règle le transport :\n" +
-                        "1. Expéditeur (port payé)\n" +
-                        "2. Destinataire (port dû)");
+                System.out.println("""
+                        Veuillez sélectionner qui règle le transport :
+                        1. Expéditeur (port payé)
+                        2. Destinataire (port dû)""");
                 userAnswer = Integer.parseInt(scanner.nextLine());
                 if(userAnswer==1 || userAnswer==2)  break;
             } catch (NumberFormatException e) {
@@ -98,11 +98,6 @@ public class Main {
         }
         while (true) ;
 
-        if (userAnswer==1){
-            clientId =shipperId;
-        }else {
-            clientId=recipientId;
-        }
 
         int zone =determineZone(localityList, clientList, recipientId);
 
@@ -123,18 +118,16 @@ public class Main {
             shipperTax = 0;
         }
 
+        double shipperPrice = shipperTax+shipperPriceHT;
+        double recipientPrice = recipientTax+recipientPriceHT;
 
-        System.out.println(shipperTax);
-        System.out.println(recipientTax);
 
-        System.out.println(shipperPriceHT);
-        System.out.println(recipientPriceHT);
-        System.out.println(zone);
-        System.out.println(weight);
-        System.out.println(packagesNumber);
-        System.out.println(shipperId);
-        System.out.println(recipientId);
-        System.out.println(clientId);
+        System.out.println("Détails du calcul :\n" +
+                "Nombre de colis :" + packagesNumber+ "\n" +
+                "Poids total de l'expédition : "+weight+" kg\n" +
+                "Tarif destinataire  : "+recipientPriceHT+"\n" +
+                "Tarif expéditeur  : "+shipperPriceHT+"\n" +
+                "Zone du destinataire : "+zone+"\n");
 
 
 
@@ -161,8 +154,7 @@ public class Main {
 
     private static int determineZone(HashMap<String, Locality>  localityList, HashMap<Integer, Client>  clients, int recipientId) {
         String clientCity =clients.get(recipientId).city;
-        int zone = localityList.get(clientCity).zone;
-        return zone;
+        return localityList.get(clientCity).zone;
     }
 
     private static ConditionTaxation findClientConditionTaxation(ArrayList<ConditionTaxation> conditionTaxationsList, int clientId){
