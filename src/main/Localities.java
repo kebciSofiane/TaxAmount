@@ -39,7 +39,7 @@ public class Localities {
         for (Element clientElement : objectClientElements) {
             String postalCode = clientElement.elementText("codePostal");
             String ville = clientElement.elementText("ville");
-            String zone = clientElement.elementText("zone");
+            int zone = Integer.parseInt(clientElement.elementText("zone"));
 
             Locality locality = new Locality(postalCode,ville,zone);
 

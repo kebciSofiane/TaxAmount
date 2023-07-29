@@ -1,14 +1,13 @@
 package main;
 
 public class ConditionTaxation {
-    String taxePortDu;
-    String idClient;
-    String taxePortPaye;
-    String useTaxePortDuGenerale;
-    String useTaxePortPayeGenerale;
+    double taxePortDu;
+    int idClient;
+    double taxePortPaye;
+    boolean useTaxePortDuGenerale;
+    boolean useTaxePortPayeGenerale;
 
-
-    public ConditionTaxation(String taxePortDu, String idClient, String taxePortPaye, String useTaxePortDuGenerale, String useTaxePortPayeGenerale) {
+    public ConditionTaxation(double taxePortDu, int idClient, double taxePortPaye, boolean useTaxePortDuGenerale, boolean useTaxePortPayeGenerale) {
         this.taxePortDu = taxePortDu;
         this.idClient = idClient;
         this.taxePortPaye = taxePortPaye;
@@ -16,23 +15,23 @@ public class ConditionTaxation {
         this.useTaxePortPayeGenerale = useTaxePortPayeGenerale;
     }
 
-    public String getTaxePortDu() {
+    public double getTaxePortDu() {
         return taxePortDu;
     }
 
-    public String getIdClient() {
+    public int getIdClient() {
         return idClient;
     }
 
-    public String getTaxePortPaye() {
+    public double getTaxePortPaye() {
         return taxePortPaye;
     }
 
-    public String getUseTaxePortDuGenerale() {
+    public boolean isUseTaxePortDuGenerale() {
         return useTaxePortDuGenerale;
     }
 
-    public String getUseTaxePortPayeGenerale() {
+    public boolean isUseTaxePortPayeGenerale() {
         return useTaxePortPayeGenerale;
     }
 }

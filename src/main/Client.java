@@ -2,11 +2,11 @@ package main;
 
 public class Client {
     String postalCode;
-    String clientId;
+    int clientId;
     String socialRaison;
     String city;
 
-    public Client(String postalCode, String clientId, String socialRaison, String city) {
+    public Client(String postalCode, int clientId, String socialRaison, String city) {
         this.postalCode = postalCode;
         this.clientId = clientId;
         this.socialRaison = socialRaison;
@@ -17,7 +17,7 @@ public class Client {
         return postalCode;
     }
 
-    public String getIdClient() {
+    public int getIdClient() {
         return clientId;
     }
 

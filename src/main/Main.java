@@ -11,9 +11,9 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         int packagesNumber;
         int weight;
-        String shipperId;
-        String recipientId;
-        String clientId;
+        int shipperId;
+        int recipientId;
+        int clientId;
 
 
 
@@ -23,15 +23,14 @@ public class Main {
         Localities localities= new Localities();
         Prices prices = new Prices();
 
-        HashMap<String, Client> clientList = clients.getClients();
+        HashMap<Integer, Client> clientList = clients.getClients();
         ArrayList<ConditionTaxation> conditionTaxationsList = conditionsTaxation.getConditionsTaxation();
         HashMap<String, Locality> localityList = localities.getLocalities();
         ArrayList<Price> priceList = prices.getPrices();
 
 
         System.out.println("Here is our clients: ");
-        ArrayList<String> idList= new ArrayList<>();
-
+        ArrayList<Integer> idList= new ArrayList<>();
         for (Client client : clientList.values()){
             idList.add(client.clientId);
             System.out.println("ClientId : "+client.clientId);
@@ -42,19 +41,19 @@ public class Main {
         }
 
         System.out.println("Veuillez sélectionner l'id de votre expéditeur !");
-        shipperId = scanner.nextLine();
+        shipperId = Integer.parseInt(scanner.nextLine());
         while (!idList.contains(shipperId)){
             System.out.println("L'identifiant du client n'est pas valide : " + shipperId);
             System.out.println("Veuillez sélectionner l'id de votre expéditeur !");
-            shipperId = scanner.nextLine();
+            shipperId = Integer.parseInt(scanner.nextLine());
         }
 
         System.out.println("Veuillez sélectionner l'id de votre destinataire !");
-        recipientId = scanner.nextLine();
+        recipientId = Integer.parseInt(scanner.nextLine());
         while (!idList.contains(shipperId)){
             System.out.println("L'identifiant du client n'est pas valide : " + recipientId);
             System.out.println("Veuillez sélectionner l'id de votre destinataire !");
-            recipientId = scanner.nextLine();
+            recipientId = Integer.parseInt(scanner.nextLine());
         }
 
         do {
@@ -112,7 +111,7 @@ public class Main {
 
         double shipperTax;
         double recipientTax;
-        ConditionTaxation defaultConditionTaxation= findClientConditionTaxation(conditionTaxationsList,null);
+        ConditionTaxation defaultConditionTaxation= findClientConditionTaxation(conditionTaxationsList,0);
 
         if ( userAnswer==1 ){
             ConditionTaxation shipperConditionTaxation= findClientConditionTaxation(conditionTaxationsList,shipperId);
@@ -141,13 +140,13 @@ public class Main {
 
     }
 
-    private static double determinePrice(ArrayList<Price> priceList, String clientId, int zone) {
-        double clientPrice = -1;
+    private static double determinePrice(ArrayList<Price> priceList, int clientId, int zone) {
+        double clientPrice ;
         for (Price price : priceList) {
             // Vérifier si l'objet Price correspond aux critères de recherche
-            if (price.getIdClient().equals(clientId) && price.getZone().equals(String.valueOf(zone))) {
+            if (price.getIdClient()==clientId && price.getZone()==zone) {
                 // Si c'est le cas, retourner le montant (tarif)
-                clientPrice = Double.parseDouble(price.getMontant());
+                clientPrice = price.getMontant();
                 return clientPrice;
             }
 
@@ -155,21 +154,21 @@ public class Main {
         if (zone - 1 != 0)
             clientPrice = determinePrice(priceList, clientId, zone - 1);
         else
-            clientPrice = determinePrice(priceList, "0", zone);
+            clientPrice = determinePrice(priceList, 0, zone);
 
         return clientPrice;
     }
 
-    private static int determineZone(HashMap<String, Locality>  localityList, HashMap<String, Client>  clients, String recipientId) {
+    private static int determineZone(HashMap<String, Locality>  localityList, HashMap<Integer, Client>  clients, int recipientId) {
         String clientCity =clients.get(recipientId).city;
-        String zone = localityList.get(clientCity).zone;
-        return Integer.parseInt(zone);
+        int zone = localityList.get(clientCity).zone;
+        return zone;
     }
 
-    private static ConditionTaxation findClientConditionTaxation(ArrayList<ConditionTaxation> conditionTaxationsList, String clientId){
+    private static ConditionTaxation findClientConditionTaxation(ArrayList<ConditionTaxation> conditionTaxationsList, int clientId){
         ConditionTaxation conditionClient = null;
         for (ConditionTaxation conditionTaxation : conditionTaxationsList) {
-            if (conditionTaxation.getIdClient().equals(clientId)) {
+            if (conditionTaxation.getIdClient()==clientId) {
                 conditionClient = conditionTaxation;
             }
         }
@@ -182,22 +181,22 @@ public class Main {
 
         // Vérifier si l'expéditeur règle le transport
         if (userAnswer == 2) {
-            if (conditionTaxation.useTaxePortDuGenerale.equals("true")) {
+            if (conditionTaxation.useTaxePortDuGenerale) {
                 // Si la taxe pour l'expéditeur doit être celle spécifiée dans la condition de taxation générale
-                taxesAPayer += Double.parseDouble(defaultConditionTaxation.taxePortDu);
+                taxesAPayer += defaultConditionTaxation.taxePortDu;
             } else {
                 // Sinon, calculer la taxe en fonction du montant du transport multiplié par le taux spécifique au client
-                taxesAPayer += Double.parseDouble(conditionTaxation.taxePortDu);
+                taxesAPayer += conditionTaxation.taxePortDu;
             }
         }
     else{
         // Vérifier si le destinataire règle le transport
-            if (conditionTaxation.useTaxePortPayeGenerale.equals("true")) {
+            if (conditionTaxation.useTaxePortPayeGenerale) {
                 // Si la taxe pour le destinataire doit être celle spécifiée dans la condition de taxation générale
-                taxesAPayer += Double.parseDouble(defaultConditionTaxation.taxePortPaye);
+                taxesAPayer += defaultConditionTaxation.taxePortPaye;
             } else {
                 // Sinon, calculer la taxe en fonction du montant du transport multiplié par le taux spécifique au client
-                taxesAPayer +=  Double.parseDouble(conditionTaxation.taxePortPaye);
+                taxesAPayer +=  conditionTaxation.taxePortPaye;
             }
         }
 

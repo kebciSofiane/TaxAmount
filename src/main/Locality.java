@@ -3,9 +3,9 @@ package main;
 public class Locality {
     String codePostal;
     String ville;
-    String zone;
+    int zone;
 
-    public Locality(String codePostal, String ville, String zone) {
+    public Locality(String codePostal, String ville, int zone) {
         this.codePostal = codePostal;
         this.ville = ville;
         this.zone = zone;
@@ -19,7 +19,7 @@ public class Locality {
         return ville;
     }
 
-    public String getZone() {
+    public int getZone() {
         return zone;
     }
 }

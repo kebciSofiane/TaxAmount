@@ -8,6 +8,7 @@ import org.dom4j.io.SAXReader;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ConditionsTaxation {
     ArrayList<ConditionTaxation> conditionTaxationList;
@@ -36,11 +37,17 @@ public class ConditionsTaxation {
 
         // Parcourir la liste des clients
         for (Element clientElement : objectClientElements) {
-            String taxePortDu = clientElement.elementText("taxePortDu");
-            String idClient = clientElement.elementText("idClient");
-            String taxePortPaye = clientElement.elementText("taxePortPaye");
-            String useTaxePortDuGenerale = clientElement.elementText("useTaxePortDuGenerale");
-            String useTaxePortPayeGenerale = clientElement.elementText("useTaxePortPayeGenerale");
+            double taxePortDu = Double.parseDouble(clientElement.elementText("taxePortDu"));
+            String idClientString = clientElement.elementText("idClient");
+            int idClient;
+            if (!Objects.equals(idClientString, "")) {
+                 idClient = Integer.parseInt(idClientString);
+            } else {
+                 idClient = 0;
+            }
+            double taxePortPaye = Double.parseDouble(clientElement.elementText("taxePortPaye"));
+            boolean useTaxePortDuGenerale = Boolean.parseBoolean(clientElement.elementText("useTaxePortDuGenerale"));
+            boolean useTaxePortPayeGenerale = Boolean.parseBoolean(clientElement.elementText("useTaxePortPayeGenerale"));
 
             ConditionTaxation conditionTaxation= new ConditionTaxation(taxePortDu,idClient,
                     taxePortPaye, useTaxePortDuGenerale,useTaxePortPayeGenerale);

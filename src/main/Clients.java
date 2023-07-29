@@ -11,13 +11,13 @@ import java.util.List;
 
 
 public class Clients {
-    HashMap<String, Client> clients;
+    HashMap<Integer, Client> clients;
 
     public Clients() {
         this.clients = new HashMap<>();
     }
 
-    public HashMap<String, Client> getClients() throws DocumentException {
+    public HashMap<Integer, Client> getClients() throws DocumentException {
         // Charger le fichier XML
         File xmlFile = new File("src/data/client.xml");
         SAXReader saxReader = new SAXReader();
@@ -38,7 +38,7 @@ public class Clients {
         // Parcourir la liste des clients
         for (Element clientElement : objectClientElements) {
             String postalCode = clientElement.elementText("codePostal");
-            String clientId = clientElement.elementText("idClient");
+            int clientId = Integer.parseInt(clientElement.elementText("idClient"));
             String socialRaison = clientElement.elementText("raisonSociale");
             String city = clientElement.elementText("ville");
 

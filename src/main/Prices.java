@@ -8,6 +8,7 @@ import org.dom4j.io.SAXReader;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Prices {
 
@@ -37,10 +38,16 @@ public class Prices {
 
         // Parcourir la liste des clients
         for (Element clientElement : objectClientElements) {
-            String idClient = clientElement.elementText("idClient");
-            String idClientHeritage = clientElement.elementText("idClientHeritage");
-            String montant = clientElement.elementText("montant");
-            String zone = clientElement.elementText("zone");
+            int idClient = Integer.parseInt(clientElement.elementText("idClient"));
+            String idClientHeritageString = clientElement.elementText("idClientHeritage");
+            int idClientHeritage;
+            if (!Objects.equals(idClientHeritageString, "")) {
+                idClientHeritage = Integer.parseInt(idClientHeritageString);
+            } else {
+                idClientHeritage = 0;
+            }
+            double montant = Double.parseDouble(clientElement.elementText("montant"));
+            int zone = Integer.parseInt(clientElement.elementText("zone"));
             String codeDepartement = clientElement.elementText("codeDepartement");
 
 
