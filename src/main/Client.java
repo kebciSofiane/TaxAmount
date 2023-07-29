@@ -1,3 +1,5 @@
+package main;
+
 public class Client {
     String postalCode;
     String clientId;

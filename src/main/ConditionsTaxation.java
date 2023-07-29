@@ -1,3 +1,5 @@
+package main;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -8,15 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConditionsTaxation {
-    ArrayList<ConditionTaxation> ConditionTaxationList;
+    ArrayList<ConditionTaxation> conditionTaxationList;
 
     public ConditionsTaxation() {
-        this.ConditionTaxationList = new ArrayList<>();
+        this.conditionTaxationList = new ArrayList<>();
     }
 
     public ArrayList<ConditionTaxation> getConditionsTaxation() throws DocumentException {
         // Charger le fichier XML
-        File xmlFile = new File("src/data/client.xml");
+        File xmlFile = new File("src/data/conditiontaxation.xml");
         SAXReader saxReader = new SAXReader();
         Document document = saxReader.read(xmlFile);
 
@@ -30,21 +32,21 @@ public class ConditionsTaxation {
         Element objectElement = responseElement.element("Object");
 
         // Récupérer la liste des éléments ObjectClient
-        List<Element> objectClientElements = objectElement.elements("ObjectClient");
+        List<Element> objectClientElements = objectElement.elements("ObjectConditionTaxation");
 
         // Parcourir la liste des clients
         for (Element clientElement : objectClientElements) {
             String taxePortDu = clientElement.elementText("taxePortDu");
             String idClient = clientElement.elementText("idClient");
-            String raisonSociale = clientElement.elementText("raisonSociale");
+            String taxePortPaye = clientElement.elementText("taxePortPaye");
             String useTaxePortDuGenerale = clientElement.elementText("useTaxePortDuGenerale");
             String useTaxePortPayeGenerale = clientElement.elementText("useTaxePortPayeGenerale");
 
             ConditionTaxation conditionTaxation= new ConditionTaxation(taxePortDu,idClient,
-                    raisonSociale, useTaxePortDuGenerale,useTaxePortPayeGenerale);
-            ConditionTaxationList.add(conditionTaxation);
+                    taxePortPaye, useTaxePortDuGenerale,useTaxePortPayeGenerale);
+            conditionTaxationList.add(conditionTaxation);
 
         }
-        return ConditionTaxationList;
+        return conditionTaxationList;
     }
 }

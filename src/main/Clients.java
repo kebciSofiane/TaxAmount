@@ -1,20 +1,22 @@
+package main;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Localities {
-    ArrayList<Locality> localities;
 
-    public Localities() {
-        this.localities = new ArrayList<>();
+public class Clients {
+    ArrayList<Client> clients;
+
+    public Clients() {
+        this.clients = new ArrayList<>();
     }
 
-    public ArrayList<Locality> getLocalities() throws DocumentException {
+    public ArrayList<Client> getClients() throws DocumentException {
         // Charger le fichier XML
         File xmlFile = new File("src/data/client.xml");
         SAXReader saxReader = new SAXReader();
@@ -35,14 +37,17 @@ public class Localities {
         // Parcourir la liste des clients
         for (Element clientElement : objectClientElements) {
             String postalCode = clientElement.elementText("codePostal");
-            String ville = clientElement.elementText("ville");
-            String zone = clientElement.elementText("zone");
+            String clientId = clientElement.elementText("idClient");
+            String socialRaison = clientElement.elementText("raisonSociale");
+            String city = clientElement.elementText("ville");
 
-            Locality locality = new Locality(postalCode,ville,zone);
-
-            localities.add(locality);
+            Client client = new Client(postalCode,clientId,socialRaison,city);
+            clients.add(client);
 
         }
-        return localities;
+        return clients;
     }
+
+
+
 }

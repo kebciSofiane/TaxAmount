@@ -1,3 +1,5 @@
+package main;
+
 public class ConditionTaxation {
     String taxePortDu;
     String idClient;

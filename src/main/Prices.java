@@ -1,3 +1,5 @@
+package main;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -17,7 +19,7 @@ public class Prices {
 
     public ArrayList<Price> getPrices() throws DocumentException {
         // Charger le fichier XML
-        File xmlFile = new File("src/data/client.xml");
+        File xmlFile = new File("src/data/tarif.xml");
         SAXReader saxReader = new SAXReader();
         Document document = saxReader.read(xmlFile);
 
@@ -31,7 +33,7 @@ public class Prices {
         Element objectElement = responseElement.element("Object");
 
         // Récupérer la liste des éléments ObjectClient
-        List<Element> objectClientElements = objectElement.elements("ObjectClient");
+        List<Element> objectClientElements = objectElement.elements("ObjectTarif");
 
         // Parcourir la liste des clients
         for (Element clientElement : objectClientElements) {
@@ -39,8 +41,10 @@ public class Prices {
             String idClientHeritage = clientElement.elementText("idClientHeritage");
             String montant = clientElement.elementText("montant");
             String zone = clientElement.elementText("zone");
+            String codeDepartement = clientElement.elementText("codeDepartement");
 
-            Price price  =new Price(idClient,idClientHeritage,montant,zone);
+
+            Price price  =new Price(idClient,idClientHeritage,montant,zone,codeDepartement);
 
             prices.add(price);
 

@@ -1,3 +1,5 @@
+package main;
+
 public class Locality {
     String codePostal;
     String ville;
