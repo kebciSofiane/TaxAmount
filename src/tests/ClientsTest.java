@@ -7,6 +7,7 @@ import org.dom4j.DocumentException;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -15,7 +16,7 @@ public class ClientsTest {
     @Test
     public void testGetData() throws DocumentException {
         Clients clients = new Clients();
-        ArrayList<Client> clientList = clients.getClients();
+        HashMap<String, Client> clientList = clients.getClients();
 
         assertEquals(clientList.get(0).getIdClient(), "1");
         assertEquals(clientList.get(1).getPostalCode(), "71");

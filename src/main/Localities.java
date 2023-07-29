@@ -7,16 +7,17 @@ import org.dom4j.io.SAXReader;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Localities {
-    ArrayList<Locality> localities;
+    HashMap<String, Locality> localities;
 
     public Localities() {
-        this.localities = new ArrayList<>();
+        this.localities = new HashMap<>();
     }
 
-    public ArrayList<Locality> getLocalities() throws DocumentException {
+    public HashMap<String, Locality> getLocalities() throws DocumentException {
         // Charger le fichier XML
         File xmlFile = new File("src/data/localite.xml");
         SAXReader saxReader = new SAXReader();
@@ -42,7 +43,7 @@ public class Localities {
 
             Locality locality = new Locality(postalCode,ville,zone);
 
-            localities.add(locality);
+            localities.put(ville, locality);
 
         }
         return localities;

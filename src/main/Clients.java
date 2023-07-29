@@ -6,17 +6,18 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
 public class Clients {
-    ArrayList<Client> clients;
+    HashMap<String, Client> clients;
 
     public Clients() {
-        this.clients = new ArrayList<>();
+        this.clients = new HashMap<>();
     }
 
-    public ArrayList<Client> getClients() throws DocumentException {
+    public HashMap<String, Client> getClients() throws DocumentException {
         // Charger le fichier XML
         File xmlFile = new File("src/data/client.xml");
         SAXReader saxReader = new SAXReader();
@@ -42,7 +43,7 @@ public class Clients {
             String city = clientElement.elementText("ville");
 
             Client client = new Client(postalCode,clientId,socialRaison,city);
-            clients.add(client);
+            clients.put(clientId,client);
 
         }
         return clients;
