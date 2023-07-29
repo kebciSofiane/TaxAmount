@@ -107,12 +107,29 @@ public class Main {
 
         int zone =determineZone(localityList, clientList, recipientId);
 
-        double shipperPrice = determinePrice(priceList, shipperId, zone);
-        double recipientPrice = determinePrice(priceList, recipientId, zone);
+        double shipperPriceHT = determinePrice(priceList, shipperId, zone);
+        double recipientPriceHT = determinePrice(priceList, recipientId, zone);
+
+        double shipperTax;
+        double recipientTax;
+        ConditionTaxation defaultConditionTaxation= findClientConditionTaxation(conditionTaxationsList,null);
+
+        if ( userAnswer==1 ){
+            ConditionTaxation shipperConditionTaxation= findClientConditionTaxation(conditionTaxationsList,shipperId);
+            shipperTax = calculateTaxes(userAnswer,shipperConditionTaxation,defaultConditionTaxation);
+            recipientTax = 0;
+        }else{
+            ConditionTaxation recipientConditionTaxation= findClientConditionTaxation(conditionTaxationsList,recipientId);
+            recipientTax = calculateTaxes(userAnswer,recipientConditionTaxation,defaultConditionTaxation);
+            shipperTax = 0;
+        }
 
 
-        System.out.println(shipperPrice);
-        System.out.println(recipientPrice);
+        System.out.println(shipperTax);
+        System.out.println(recipientTax);
+
+        System.out.println(shipperPriceHT);
+        System.out.println(recipientPriceHT);
         System.out.println(zone);
         System.out.println(weight);
         System.out.println(packagesNumber);
@@ -148,4 +165,43 @@ public class Main {
         String zone = localityList.get(clientCity).zone;
         return Integer.parseInt(zone);
     }
+
+    private static ConditionTaxation findClientConditionTaxation(ArrayList<ConditionTaxation> conditionTaxationsList, String clientId){
+        ConditionTaxation conditionClient = null;
+        for (ConditionTaxation conditionTaxation : conditionTaxationsList) {
+            if (conditionTaxation.getIdClient().equals(clientId)) {
+                conditionClient = conditionTaxation;
+            }
+        }
+        if (conditionClient==null) conditionClient=conditionTaxationsList.get(0);
+        return  conditionClient;
+    }
+    private static double calculateTaxes(int userAnswer, ConditionTaxation conditionTaxation, ConditionTaxation defaultConditionTaxation) {
+
+        double taxesAPayer = 0.0;
+
+        // Vérifier si l'expéditeur règle le transport
+        if (userAnswer == 2) {
+            if (conditionTaxation.useTaxePortDuGenerale.equals("true")) {
+                // Si la taxe pour l'expéditeur doit être celle spécifiée dans la condition de taxation générale
+                taxesAPayer += Double.parseDouble(defaultConditionTaxation.taxePortDu);
+            } else {
+                // Sinon, calculer la taxe en fonction du montant du transport multiplié par le taux spécifique au client
+                taxesAPayer += Double.parseDouble(conditionTaxation.taxePortDu);
+            }
+        }
+    else{
+        // Vérifier si le destinataire règle le transport
+            if (conditionTaxation.useTaxePortPayeGenerale.equals("true")) {
+                // Si la taxe pour le destinataire doit être celle spécifiée dans la condition de taxation générale
+                taxesAPayer += Double.parseDouble(defaultConditionTaxation.taxePortPaye);
+            } else {
+                // Sinon, calculer la taxe en fonction du montant du transport multiplié par le taux spécifique au client
+                taxesAPayer +=  Double.parseDouble(conditionTaxation.taxePortPaye);
+            }
+        }
+
+        return taxesAPayer;
+    }
+
 }
