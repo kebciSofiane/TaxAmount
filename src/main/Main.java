@@ -13,9 +13,13 @@ public class Main {
         int weight;
         int shipperId;
         int recipientId;
-
-
-
+        int zone;
+        int SenderOrShipperPaysFees;
+        double shipperPriceHT;
+        double recipientPriceHT;
+        double shipperPrice;
+        double recipientPrice;
+        ConditionTaxation defaultConditionTaxation;
 
         Clients clients = new Clients();
         ConditionsTaxation conditionsTaxation  = new ConditionsTaxation();
@@ -23,11 +27,43 @@ public class Main {
         Prices prices = new Prices();
 
         HashMap<Integer, Client> clientList = clients.getClients();
-        ArrayList<ConditionTaxation> conditionTaxationsList = conditionsTaxation.getConditionsTaxation();
         HashMap<String, Locality> localityList = localities.getLocalities();
+        ArrayList<ConditionTaxation> conditionTaxationList = conditionsTaxation.getConditionsTaxation();
         ArrayList<Price> priceList = prices.getPrices();
 
 
+        ArrayList<Integer> idList = showClientsDetails(clientList);
+
+        shipperId = getShipperId(scanner, idList);
+
+        recipientId = getRecipientId(scanner, idList, shipperId);
+
+        packagesNumber = getPackagesNumber(scanner);
+
+        weight = getWeight(scanner);
+        
+        SenderOrShipperPaysFees=determineSenderOrShipperPaysFees(scanner);
+        
+        zone =determineZone(localityList, clientList, recipientId);
+
+        shipperPriceHT = determinePrice(priceList, shipperId, zone);
+        
+        recipientPriceHT = determinePrice(priceList, recipientId, zone);
+        
+        defaultConditionTaxation= findClientConditionTaxation(conditionTaxationList,0);
+
+        ShipperAndRecipientFees shipperAndRecipientFees = getShipperAndRecipientFees(SenderOrShipperPaysFees, conditionTaxationList, shipperId, defaultConditionTaxation, recipientId);
+
+        shipperPrice = shipperAndRecipientFees.shipperFees() +shipperPriceHT;
+
+        recipientPrice = shipperAndRecipientFees.recipientFees() +recipientPriceHT;
+
+        showCalculationDetails(shipperId, recipientId, packagesNumber, weight, zone, recipientPriceHT, shipperPriceHT, recipientPrice, shipperPrice);
+
+
+    }
+
+    private static ArrayList<Integer> showClientsDetails(HashMap<Integer, Client> clientList) {
         System.out.println("Here is our clients: ");
         ArrayList<Integer> idList= new ArrayList<>();
         for (Client client : clientList.values()){
@@ -38,23 +74,54 @@ public class Main {
             System.out.println("city : "+client.city);
             System.out.println("---------");
         }
+        return idList;
+    }
 
+    private static int getShipperId(Scanner scanner, ArrayList<Integer> idList) {
+        int shipperId;
         System.out.println("Veuillez sélectionner l'id de votre expéditeur !");
-        shipperId = Integer.parseInt(scanner.nextLine());
-        while (!idList.contains(shipperId)){
-            System.out.println("L'identifiant du client n'est pas valide : " + shipperId);
-            System.out.println("Veuillez sélectionner l'id de votre expéditeur !");
-            shipperId = Integer.parseInt(scanner.nextLine());
-        }
 
+        while (true) {
+            try {
+                shipperId = Integer.parseInt(scanner.nextLine());
+                if (idList.contains(shipperId)) {
+                    // Check if the shipper ID is valid
+                    break; // Exit the loop if the shipper ID is valid
+                } else {
+                    System.out.println("L'identifiant du client n'est pas valide : " + shipperId);
+                    System.out.println("Veuillez sélectionner l'id de votre expéditeur !");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Erreur : Vous devez saisir un identifiant valide (entier).");
+                System.out.println("Veuillez sélectionner l'id de votre expéditeur !");
+            }
+        }
+        return shipperId;
+    }
+
+    private static int getRecipientId(Scanner scanner, ArrayList<Integer> idList, int shipperId) {
+        int recipientId;
         System.out.println("Veuillez sélectionner l'id de votre destinataire !");
-        recipientId = Integer.parseInt(scanner.nextLine());
-        while (!idList.contains(shipperId)){
-            System.out.println("L'identifiant du client n'est pas valide : " + recipientId);
-            System.out.println("Veuillez sélectionner l'id de votre destinataire !");
-            recipientId = Integer.parseInt(scanner.nextLine());
+        while (true) {
+            try {
+                recipientId = Integer.parseInt(scanner.nextLine());
+                if (idList.contains(recipientId) && recipientId != shipperId) {
+                    // Check if the recipient ID is valid and not the same as the shipper ID
+                    break; // Exit the loop if the recipient ID is valid
+                } else {
+                    System.out.println("L'identifiant du client n'est pas valide : " + recipientId);
+                    System.out.println("Veuillez sélectionner l'id de votre destinataire !");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Erreur : Vous devez saisir un identifiant valide (entier).");
+                System.out.println("Veuillez sélectionner l'id de votre destinataire !");
+            }
         }
+        return recipientId;
+    }
 
+    private static int getPackagesNumber(Scanner scanner) {
+        int packagesNumber;
         do {
             try {
                 System.out.println("Veuillez sélectionner le nombre de colis !");
@@ -65,11 +132,11 @@ public class Main {
             }
         }
         while (true) ;
+        return packagesNumber;
+    }
 
-
-
-
-
+    private static int getWeight(Scanner scanner) {
+        int weight;
         do {
             try {
                 System.out.println("Veuillez sélectionner le poids des colis !");
@@ -80,58 +147,34 @@ public class Main {
             }
         }
         while (true) ;
+        return weight;
+    }
 
-
-        int userAnswer;
-
+    private static int determineSenderOrShipperPaysFees(Scanner scanner) {
+        int SenderOrShipperPaysFees;
         do {
             try {
                 System.out.println("""
                         Veuillez sélectionner qui règle le transport :
                         1. Expéditeur (port payé)
                         2. Destinataire (port dû)""");
-                userAnswer = Integer.parseInt(scanner.nextLine());
-                if(userAnswer==1 || userAnswer==2)  break;
+                SenderOrShipperPaysFees = Integer.parseInt(scanner.nextLine());
+                if(SenderOrShipperPaysFees==1 || SenderOrShipperPaysFees==2)  break;
             } catch (NumberFormatException e) {
                 System.out.println("Erreur : Vous devez saisir un entier valide.");
             }
         }
         while (true) ;
 
-
-        int zone =determineZone(localityList, clientList, recipientId);
-
-        double shipperPriceHT = determinePrice(priceList, shipperId, zone);
-        double recipientPriceHT = determinePrice(priceList, recipientId, zone);
-
-        double shipperTax;
-        double recipientTax;
-        ConditionTaxation defaultConditionTaxation= findClientConditionTaxation(conditionTaxationsList,0);
-
-        if ( userAnswer==1 ){
-            ConditionTaxation shipperConditionTaxation= findClientConditionTaxation(conditionTaxationsList,shipperId);
-            shipperTax = calculateTaxes(userAnswer,shipperConditionTaxation,defaultConditionTaxation);
-            recipientTax = 0;
-        }else{
-            ConditionTaxation recipientConditionTaxation= findClientConditionTaxation(conditionTaxationsList,recipientId);
-            recipientTax = calculateTaxes(userAnswer,recipientConditionTaxation,defaultConditionTaxation);
-            shipperTax = 0;
-        }
-
-        double shipperPrice = shipperTax+shipperPriceHT;
-        double recipientPrice = recipientTax+recipientPriceHT;
-
-
-        System.out.println("Détails du calcul :\n" +
-                "Nombre de colis :" + packagesNumber+ "\n" +
-                "Poids total de l'expédition : "+weight+" kg\n" +
-                "Tarif destinataire  : "+recipientPriceHT+"\n" +
-                "Tarif expéditeur  : "+shipperPriceHT+"\n" +
-                "Zone du destinataire : "+zone+"\n");
-
-
-
+        return  SenderOrShipperPaysFees;
     }
+
+
+    private static int determineZone(HashMap<String, Locality>  localityList, HashMap<Integer, Client>  clients, int recipientId) {
+        String clientCity =clients.get(recipientId).city;
+        return localityList.get(clientCity).zone;
+    }
+
 
     private static double determinePrice(ArrayList<Price> priceList, int clientId, int zone) {
         double clientPrice ;
@@ -152,10 +195,6 @@ public class Main {
         return clientPrice;
     }
 
-    private static int determineZone(HashMap<String, Locality>  localityList, HashMap<Integer, Client>  clients, int recipientId) {
-        String clientCity =clients.get(recipientId).city;
-        return localityList.get(clientCity).zone;
-    }
 
     private static ConditionTaxation findClientConditionTaxation(ArrayList<ConditionTaxation> conditionTaxationsList, int clientId){
         ConditionTaxation conditionClient = null;
@@ -167,32 +206,65 @@ public class Main {
         if (conditionClient==null) conditionClient=conditionTaxationsList.get(0);
         return  conditionClient;
     }
-    private static double calculateTaxes(int userAnswer, ConditionTaxation conditionTaxation, ConditionTaxation defaultConditionTaxation) {
 
-        double taxesAPayer = 0.0;
+    private static ShipperAndRecipientFees getShipperAndRecipientFees(int SenderOrShipperPaysFees, ArrayList<ConditionTaxation> conditionTaxationsList, int shipperId, ConditionTaxation defaultConditionTaxation, int recipientId) {
+        double shipperTax;
+        double recipientTax;
+        if ( SenderOrShipperPaysFees ==1 ){
+            ConditionTaxation shipperConditionTaxation= findClientConditionTaxation(conditionTaxationsList, shipperId);
+            shipperTax = calculateFees(SenderOrShipperPaysFees,shipperConditionTaxation, defaultConditionTaxation);
+            recipientTax = 0;
+        }else{
+            ConditionTaxation recipientConditionTaxation= findClientConditionTaxation(conditionTaxationsList, recipientId);
+            recipientTax = calculateFees(SenderOrShipperPaysFees,recipientConditionTaxation, defaultConditionTaxation);
+            shipperTax = 0;
+        }
+        return new ShipperAndRecipientFees(shipperTax, recipientTax);
+    }
+
+    private record ShipperAndRecipientFees(double shipperFees, double recipientFees) {
+    }
+
+
+    private static double calculateFees(int userAnswer, ConditionTaxation conditionTaxation, ConditionTaxation defaultConditionTaxation) {
+
+        double fees = 0.0;
 
         // Vérifier si l'expéditeur règle le transport
         if (userAnswer == 2) {
             if (conditionTaxation.useTaxePortDuGenerale) {
                 // Si la taxe pour l'expéditeur doit être celle spécifiée dans la condition de taxation générale
-                taxesAPayer += defaultConditionTaxation.taxePortDu;
+                fees += defaultConditionTaxation.taxePortDu;
             } else {
                 // Sinon, calculer la taxe en fonction du montant du transport multiplié par le taux spécifique au client
-                taxesAPayer += conditionTaxation.taxePortDu;
+                fees += conditionTaxation.taxePortDu;
             }
         }
-    else{
-        // Vérifier si le destinataire règle le transport
+        else{
+            // Vérifier si le destinataire règle le transport
             if (conditionTaxation.useTaxePortPayeGenerale) {
                 // Si la taxe pour le destinataire doit être celle spécifiée dans la condition de taxation générale
-                taxesAPayer += defaultConditionTaxation.taxePortPaye;
+                fees += defaultConditionTaxation.taxePortPaye;
             } else {
                 // Sinon, calculer la taxe en fonction du montant du transport multiplié par le taux spécifique au client
-                taxesAPayer +=  conditionTaxation.taxePortPaye;
+                fees +=  conditionTaxation.taxePortPaye;
             }
         }
 
-        return taxesAPayer;
+        return fees;
+    }
+
+    private static void showCalculationDetails(int shipperId, int recipientId, int packagesNumber, int weight, int zone, double recipientPriceHT, double shipperPriceHT, double recipientPrice, double shipperPrice) {
+        System.out.println("Détails du calcul :\n" +
+                "Id de l'expéditeur : "+ shipperId +"\n"+
+                "Id de du destinataire : "+ recipientId +"\n"+
+                "Nombre de colis :" + packagesNumber + "\n" +
+                "Poids total de l'expédition : "+ weight +" kg\n" +
+                "Zone du destinataire : "+ zone +"\n"+
+                "TarifHT destinataire  : "+ recipientPriceHT +"\n" +
+                "TarifHT expéditeur  : "+ shipperPriceHT +"\n" +
+                "Tarif total destinataire  : "+ recipientPrice +"\n" +
+                "Tarif total expéditeur  : "+ shipperPrice +"\n");
     }
 
 }
