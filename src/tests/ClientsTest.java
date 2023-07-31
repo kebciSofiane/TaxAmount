@@ -1,12 +1,11 @@
 package tests;
 
-import main.Client;
-import main.Clients;
+import main.singleData.Client;
+import main.dataManagement.Clients;
 
 import org.dom4j.DocumentException;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import static junit.framework.TestCase.assertEquals;

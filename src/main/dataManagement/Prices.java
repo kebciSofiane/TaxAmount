@@ -1,5 +1,6 @@
-package main;
+package main.dataManagement;
 
+import main.singleData.Price;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;

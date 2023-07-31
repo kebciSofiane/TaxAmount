@@ -1,5 +1,13 @@
 package main;
 
+import main.dataManagement.Clients;
+import main.dataManagement.ConditionsTaxation;
+import main.dataManagement.Localities;
+import main.dataManagement.Prices;
+import main.singleData.Client;
+import main.singleData.ConditionTaxation;
+import main.singleData.Locality;
+import main.singleData.Price;
 import org.dom4j.DocumentException;
 
 import java.util.ArrayList;
@@ -28,7 +36,7 @@ public class Main {
 
         HashMap<Integer, Client> clientList = clients.getClients();
         HashMap<String, Locality> localityList = localities.getLocalities();
-        ArrayList<ConditionTaxation> conditionTaxationList = conditionsTaxation.getConditionsTaxation();
+        HashMap<Integer, ConditionTaxation> conditionTaxationList = conditionsTaxation.getConditionsTaxation();
         ArrayList<Price> priceList = prices.getPrices();
 
 
@@ -67,11 +75,11 @@ public class Main {
         System.out.println("Here is our clients: ");
         ArrayList<Integer> idList= new ArrayList<>();
         for (Client client : clientList.values()){
-            idList.add(client.clientId);
-            System.out.println("ClientId : "+client.clientId);
-            System.out.println("postalCode : "+client.postalCode);
-            System.out.println("socialRaison : "+client.socialRaison);
-            System.out.println("city : "+client.city);
+            idList.add(client.getIdClient());
+            System.out.println("ClientId : "+client.getIdClient());
+            System.out.println("postalCode : "+client.getPostalCode());
+            System.out.println("socialRaison : "+client.getSocialRaison());
+            System.out.println("city : "+client.getCity());
             System.out.println("---------");
         }
         return idList;
@@ -171,8 +179,8 @@ public class Main {
 
 
     private static int determineZone(HashMap<String, Locality>  localityList, HashMap<Integer, Client>  clients, int recipientId) {
-        String clientCity =clients.get(recipientId).city;
-        return localityList.get(clientCity).zone;
+        String clientCity =clients.get(recipientId).getCity();
+        return localityList.get(clientCity).getZone();
     }
 
 
@@ -196,18 +204,13 @@ public class Main {
     }
 
 
-    private static ConditionTaxation findClientConditionTaxation(ArrayList<ConditionTaxation> conditionTaxationsList, int clientId){
-        ConditionTaxation conditionClient = null;
-        for (ConditionTaxation conditionTaxation : conditionTaxationsList) {
-            if (conditionTaxation.getIdClient()==clientId) {
-                conditionClient = conditionTaxation;
-            }
-        }
-        if (conditionClient==null) conditionClient=conditionTaxationsList.get(0);
+    private static ConditionTaxation findClientConditionTaxation(HashMap<Integer, ConditionTaxation> conditionTaxationList, int clientId){
+        ConditionTaxation conditionClient = conditionTaxationList.get(clientId);
+        if (conditionClient==null) conditionClient=conditionTaxationList.get(0);
         return  conditionClient;
     }
 
-    private static ShipperAndRecipientFees getShipperAndRecipientFees(int SenderOrShipperPaysFees, ArrayList<ConditionTaxation> conditionTaxationsList, int shipperId, ConditionTaxation defaultConditionTaxation, int recipientId) {
+    private static ShipperAndRecipientFees getShipperAndRecipientFees(int SenderOrShipperPaysFees, HashMap<Integer, ConditionTaxation>  conditionTaxationsList, int shipperId, ConditionTaxation defaultConditionTaxation, int recipientId) {
         double shipperTax;
         double recipientTax;
         if ( SenderOrShipperPaysFees ==1 ){
@@ -232,22 +235,22 @@ public class Main {
 
         // Vérifier si l'expéditeur règle le transport
         if (userAnswer == 2) {
-            if (conditionTaxation.useTaxePortDuGenerale) {
+            if (conditionTaxation.isUseTaxePortDuGenerale()) {
                 // Si la taxe pour l'expéditeur doit être celle spécifiée dans la condition de taxation générale
-                fees += defaultConditionTaxation.taxePortDu;
+                fees += defaultConditionTaxation.getTaxePortDu();
             } else {
                 // Sinon, calculer la taxe en fonction du montant du transport multiplié par le taux spécifique au client
-                fees += conditionTaxation.taxePortDu;
+                fees += conditionTaxation.getTaxePortDu();
             }
         }
         else{
             // Vérifier si le destinataire règle le transport
-            if (conditionTaxation.useTaxePortPayeGenerale) {
+            if (conditionTaxation.isUseTaxePortPayeGenerale()) {
                 // Si la taxe pour le destinataire doit être celle spécifiée dans la condition de taxation générale
-                fees += defaultConditionTaxation.taxePortPaye;
+                fees += defaultConditionTaxation.getTaxePortPaye();
             } else {
                 // Sinon, calculer la taxe en fonction du montant du transport multiplié par le taux spécifique au client
-                fees +=  conditionTaxation.taxePortPaye;
+                fees +=  conditionTaxation.getTaxePortPaye();
             }
         }
 

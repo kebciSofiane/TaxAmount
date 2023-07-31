@@ -1,11 +1,10 @@
 package tests;
 
-import main.Localities;
-import main.Locality;
+import main.dataManagement.Localities;
+import main.singleData.Locality;
 import org.dom4j.DocumentException;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import static junit.framework.TestCase.assertEquals;

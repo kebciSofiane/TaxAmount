@@ -1,10 +1,7 @@
 package tests;
 
-import main.Client;
-import main.Clients;
-
-import main.Price;
-import main.Prices;
+import main.singleData.Price;
+import main.dataManagement.Prices;
 import org.dom4j.DocumentException;
 import org.junit.jupiter.api.Test;
 

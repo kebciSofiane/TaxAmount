@@ -1,25 +1,25 @@
-package main;
+package main.dataManagement;
 
+import main.singleData.Locality;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+public class Localities {
+    HashMap<String, Locality> localities;
 
-public class Clients {
-    HashMap<Integer, Client> clients;
-
-    public Clients() {
-        this.clients = new HashMap<>();
+    public Localities() {
+        this.localities = new HashMap<>();
     }
 
-    public HashMap<Integer, Client> getClients() throws DocumentException {
+    public HashMap<String, Locality> getLocalities() throws DocumentException {
         // Charger le fichier XML
-        File xmlFile = new File("src/data/client.xml");
+        File xmlFile = new File("src/data/localite.xml");
         SAXReader saxReader = new SAXReader();
         Document document = saxReader.read(xmlFile);
 
@@ -33,22 +33,19 @@ public class Clients {
         Element objectElement = responseElement.element("Object");
 
         // Récupérer la liste des éléments ObjectClient
-        List<Element> objectClientElements = objectElement.elements("ObjectClient");
+        List<Element> objectClientElements = objectElement.elements("ObjectLocalite");
 
         // Parcourir la liste des clients
         for (Element clientElement : objectClientElements) {
             String postalCode = clientElement.elementText("codePostal");
-            int clientId = Integer.parseInt(clientElement.elementText("idClient"));
-            String socialRaison = clientElement.elementText("raisonSociale");
-            String city = clientElement.elementText("ville");
+            String ville = clientElement.elementText("ville");
+            int zone = Integer.parseInt(clientElement.elementText("zone"));
 
-            Client client = new Client(postalCode,clientId,socialRaison,city);
-            clients.put(clientId,client);
+            Locality locality = new Locality(postalCode,ville,zone);
+
+            localities.put(ville, locality);
 
         }
-        return clients;
+        return localities;
     }
-
-
-
 }

@@ -1,23 +1,24 @@
-package main;
+package main.dataManagement;
 
+import main.singleData.ConditionTaxation;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
 public class ConditionsTaxation {
-    ArrayList<ConditionTaxation> conditionTaxationList;
+    HashMap<Integer, ConditionTaxation> conditionTaxationList;
 
     public ConditionsTaxation() {
-        this.conditionTaxationList = new ArrayList<>();
+        this.conditionTaxationList = new HashMap<>();
     }
 
-    public ArrayList<ConditionTaxation> getConditionsTaxation() throws DocumentException {
+    public HashMap<Integer, ConditionTaxation> getConditionsTaxation() throws DocumentException {
         // Charger le fichier XML
         File xmlFile = new File("src/data/conditiontaxation.xml");
         SAXReader saxReader = new SAXReader();
@@ -51,8 +52,7 @@ public class ConditionsTaxation {
 
             ConditionTaxation conditionTaxation= new ConditionTaxation(taxePortDu,idClient,
                     taxePortPaye, useTaxePortDuGenerale,useTaxePortPayeGenerale);
-            conditionTaxationList.add(conditionTaxation);
-
+            conditionTaxationList.put(idClient,conditionTaxation);
         }
         return conditionTaxationList;
     }

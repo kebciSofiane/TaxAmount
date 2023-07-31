@@ -1,10 +1,10 @@
-package main;
+package main.singleData;
 
 public class Client {
-    String postalCode;
-    int clientId;
-    String socialRaison;
-    String city;
+    private String postalCode;
+    private int clientId;
+    private String socialRaison;
+    private String city;
 
     public Client(String postalCode, int clientId, String socialRaison, String city) {
         this.postalCode = postalCode;

@@ -1,10 +1,10 @@
-package main;
+package main.singleData;
 
 public class Price {
-    int idClient;
-    int idClientHeritage;
-    double montant;
-    int zone;
+    private int idClient;
+    private int idClientHeritage;
+    private double montant;
+    private int zone;
     String codeDepartement;
 
     public Price(int idClient, int idClientHeritage, double montant, int zone, String codeDepartement) {
