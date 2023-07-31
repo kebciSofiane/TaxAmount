@@ -1,9 +1,9 @@
 package main.singleData;
 
 public class Locality {
-    private String codePostal;
-    private String ville;
-    private int zone;
+    private final String codePostal;
+    private final String ville;
+    private final int zone;
 
     public Locality(String codePostal, String ville, int zone) {
         this.codePostal = codePostal;

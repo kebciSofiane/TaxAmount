@@ -16,6 +16,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws DocumentException {
+        // Initialisation des variables pour les entrées utilisateur
         Scanner scanner = new Scanner(System.in);
         int packagesNumber;
         int weight;
@@ -29,46 +30,57 @@ public class Main {
         double recipientPrice;
         ConditionTaxation defaultConditionTaxation;
 
+        // Initialisation des classes pour la gestion des données
         Clients clients = new Clients();
-        ConditionsTaxation conditionsTaxation  = new ConditionsTaxation();
-        Localities localities= new Localities();
+        ConditionsTaxation conditionsTaxation = new ConditionsTaxation();
+        Localities localities = new Localities();
         Prices prices = new Prices();
 
+        // Récupération des listes de données
         HashMap<Integer, Client> clientList = clients.getClients();
         HashMap<String, Locality> localityList = localities.getLocalities();
         HashMap<Integer, ConditionTaxation> conditionTaxationList = conditionsTaxation.getConditionsTaxation();
         ArrayList<Price> priceList = prices.getPrices();
 
-
+        // Afficher les détails des clients disponibles et obtenir une liste d'identifiants de clients
         ArrayList<Integer> idList = showClientsDetails(clientList);
 
+        // Obtenir l'ID de l'expéditeur à partir de l'entrée utilisateur
         shipperId = getShipperId(scanner, idList);
 
+        // Obtenir l'ID du destinataire à partir de l'entrée utilisateur
         recipientId = getRecipientId(scanner, idList, shipperId);
 
+        // Obtenir le nombre de colis à partir de l'entrée utilisateur
         packagesNumber = getPackagesNumber(scanner);
 
+        // Obtenir le poids total de l'expédition à partir de l'entrée utilisateur
         weight = getWeight(scanner);
-        
-        SenderOrShipperPaysFees=determineSenderOrShipperPaysFees(scanner);
-        
-        zone =determineZone(localityList, clientList, recipientId);
 
+        // Déterminer qui règle les frais d'expédition (l'expéditeur ou le destinataire)
+        SenderOrShipperPaysFees = determineSenderOrShipperPaysFees(scanner);
+
+        // Déterminer la zone du destinataire à partir des données de localités
+        zone = determineZone(localityList, clientList, recipientId);
+
+        // Déterminer le tarif HT de l'expéditeur pour la zone spécifiée
         shipperPriceHT = determinePrice(priceList, shipperId, zone);
-        
-        recipientPriceHT = determinePrice(priceList, recipientId, zone);
-        
-        defaultConditionTaxation= findClientConditionTaxation(conditionTaxationList,0);
 
+        // Déterminer le tarif HT du destinataire pour la zone spécifiée
+        recipientPriceHT = determinePrice(priceList, recipientId, zone);
+
+        // Trouver la condition de taxation par défaut pour les clients n'ayant pas de condition spécifique
+        defaultConditionTaxation = findClientConditionTaxation(conditionTaxationList, 0);
+
+        // Obtenir les frais d'expédition de l'expéditeur et du destinataire
         ShipperAndRecipientFees shipperAndRecipientFees = getShipperAndRecipientFees(SenderOrShipperPaysFees, conditionTaxationList, shipperId, defaultConditionTaxation, recipientId);
 
-        shipperPrice = shipperAndRecipientFees.shipperFees() +shipperPriceHT;
+        // Calculer les tarifs totaux de l'expéditeur et du destinataire en ajoutant les frais d'expédition aux tarifs HT
+        shipperPrice = shipperAndRecipientFees.shipperFees() + shipperPriceHT;
+        recipientPrice = shipperAndRecipientFees.recipientFees() + recipientPriceHT;
 
-        recipientPrice = shipperAndRecipientFees.recipientFees() +recipientPriceHT;
-
+        // Afficher les détails du calcul
         showCalculationDetails(shipperId, recipientId, packagesNumber, weight, zone, recipientPriceHT, shipperPriceHT, recipientPrice, shipperPrice);
-
-
     }
 
     private static ArrayList<Integer> showClientsDetails(HashMap<Integer, Client> clientList) {
@@ -93,8 +105,8 @@ public class Main {
             try {
                 shipperId = Integer.parseInt(scanner.nextLine());
                 if (idList.contains(shipperId)) {
-                    // Check if the shipper ID is valid
-                    break; // Exit the loop if the shipper ID is valid
+                    // vérifier que l'id est valide
+                    break;
                 } else {
                     System.out.println("L'identifiant du client n'est pas valide : " + shipperId);
                     System.out.println("Veuillez sélectionner l'id de votre expéditeur !");
@@ -113,9 +125,9 @@ public class Main {
         while (true) {
             try {
                 recipientId = Integer.parseInt(scanner.nextLine());
+                // vérifier que l'id est valide
                 if (idList.contains(recipientId) && recipientId != shipperId) {
-                    // Check if the recipient ID is valid and not the same as the shipper ID
-                    break; // Exit the loop if the recipient ID is valid
+                    break;
                 } else {
                     System.out.println("L'identifiant du client n'est pas valide : " + recipientId);
                     System.out.println("Veuillez sélectionner l'id de votre destinataire !");
@@ -167,6 +179,7 @@ public class Main {
                         1. Expéditeur (port payé)
                         2. Destinataire (port dû)""");
                 SenderOrShipperPaysFees = Integer.parseInt(scanner.nextLine());
+                // vérifier que le nombre est valide
                 if(SenderOrShipperPaysFees==1 || SenderOrShipperPaysFees==2)  break;
             } catch (NumberFormatException e) {
                 System.out.println("Erreur : Vous devez saisir un entier valide.");
@@ -178,25 +191,26 @@ public class Main {
     }
 
 
-    private static int determineZone(HashMap<String, Locality>  localityList, HashMap<Integer, Client>  clients, int recipientId) {
+    public static int determineZone(HashMap<String, Locality>  localityList, HashMap<Integer, Client>  clients, int recipientId) {
         String clientCity =clients.get(recipientId).getCity();
         return localityList.get(clientCity).getZone();
     }
 
 
-    private static double determinePrice(ArrayList<Price> priceList, int clientId, int zone) {
+    public static double determinePrice(ArrayList<Price> priceList, int clientId, int zone) {
         double clientPrice ;
         for (Price price : priceList) {
             // Vérifier si l'objet Price correspond aux critères de recherche
             if (price.getIdClient()==clientId && price.getZone()==zone) {
-                // Si c'est le cas, retourner le montant (tarif)
                 clientPrice = price.getMontant();
                 return clientPrice;
             }
 
         }
+        //Si un tarif n’existe pas dans la zone déterminée, alors on utilise le tarif de la zone z-1.
         if (zone - 1 != 0)
             clientPrice = determinePrice(priceList, clientId, zone - 1);
+        //Si le client ne possède pas de tarif pour ce département, alors on utilise le tarif général.
         else
             clientPrice = determinePrice(priceList, 0, zone);
 
@@ -204,21 +218,21 @@ public class Main {
     }
 
 
-    private static ConditionTaxation findClientConditionTaxation(HashMap<Integer, ConditionTaxation> conditionTaxationList, int clientId){
+    public static ConditionTaxation findClientConditionTaxation(HashMap<Integer, ConditionTaxation> conditionTaxationList, int clientId){
         ConditionTaxation conditionClient = conditionTaxationList.get(clientId);
         if (conditionClient==null) conditionClient=conditionTaxationList.get(0);
         return  conditionClient;
     }
 
-    private static ShipperAndRecipientFees getShipperAndRecipientFees(int SenderOrShipperPaysFees, HashMap<Integer, ConditionTaxation>  conditionTaxationsList, int shipperId, ConditionTaxation defaultConditionTaxation, int recipientId) {
+    private static ShipperAndRecipientFees getShipperAndRecipientFees(int SenderOrShipperPaysFees, HashMap<Integer, ConditionTaxation>  conditionTaxationList, int shipperId, ConditionTaxation defaultConditionTaxation, int recipientId) {
         double shipperTax;
         double recipientTax;
-        if ( SenderOrShipperPaysFees ==1 ){
-            ConditionTaxation shipperConditionTaxation= findClientConditionTaxation(conditionTaxationsList, shipperId);
+        if ( SenderOrShipperPaysFees == 1 ){ // Expéditeur paie les frais de transport
+            ConditionTaxation shipperConditionTaxation= findClientConditionTaxation(conditionTaxationList, shipperId);
             shipperTax = calculateFees(SenderOrShipperPaysFees,shipperConditionTaxation, defaultConditionTaxation);
             recipientTax = 0;
-        }else{
-            ConditionTaxation recipientConditionTaxation= findClientConditionTaxation(conditionTaxationsList, recipientId);
+        }else{ //Destinataire paie les frais de transport
+            ConditionTaxation recipientConditionTaxation= findClientConditionTaxation(conditionTaxationList, recipientId);
             recipientTax = calculateFees(SenderOrShipperPaysFees,recipientConditionTaxation, defaultConditionTaxation);
             shipperTax = 0;
         }
@@ -229,7 +243,7 @@ public class Main {
     }
 
 
-    private static double calculateFees(int userAnswer, ConditionTaxation conditionTaxation, ConditionTaxation defaultConditionTaxation) {
+    public static double calculateFees(int userAnswer, ConditionTaxation conditionTaxation, ConditionTaxation defaultConditionTaxation) {
 
         double fees = 0.0;
 

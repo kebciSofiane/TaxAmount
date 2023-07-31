@@ -1,11 +1,11 @@
 package main.singleData;
 
 public class ConditionTaxation {
-    private double taxePortDu;
-    private int idClient;
-    private double taxePortPaye;
-    private boolean useTaxePortDuGenerale;
-    private boolean useTaxePortPayeGenerale;
+    private final double taxePortDu;
+    private final int idClient;
+    private final double taxePortPaye;
+    private final boolean useTaxePortDuGenerale;
+    private final boolean useTaxePortPayeGenerale;
 
     public ConditionTaxation(double taxePortDu, int idClient, double taxePortPaye, boolean useTaxePortDuGenerale, boolean useTaxePortPayeGenerale) {
         this.taxePortDu = taxePortDu;
